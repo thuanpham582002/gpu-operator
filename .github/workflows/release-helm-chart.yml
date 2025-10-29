@@ -95,17 +95,6 @@ jobs:
           gh release create ${{ env.VERSION }} \
             deployments/gpu-operator/gpu-operator-*.tgz \
             --title "GPU Operator Helm Chart ${{ env.VERSION }}" \
-            --notes "## GPU Operator Helm Chart ${{ env.VERSION }}
-
-### Installation
-\`\`\`bash
-helm install gpu-operator \\
-  https://github.com/${{ github.repository }}/releases/download/${{ env.VERSION }}/${CHART_FILE} \\
-  --namespace gpu-operator --create-namespace \\
-  --set nvitopExporter.enabled=true
-\`\`\`
-
-### Changes
-Manually triggered release."
+            --notes "GPU Operator Helm Chart ${{ env.VERSION }} release"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
