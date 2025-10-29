@@ -90,6 +90,7 @@ var gpuStateLabels = map[string]map[string]string{
 		"nvidia.com/gpu.deploy.device-plugin":         "true",
 		"nvidia.com/gpu.deploy.dcgm":                  "true",
 		"nvidia.com/gpu.deploy.dcgm-exporter":         "true",
+		"nvidia.com/gpu.deploy.nvitop-exporter":       "true",
 		"nvidia.com/gpu.deploy.node-status-exporter":  "true",
 		"nvidia.com/gpu.deploy.operator-validator":    "true",
 	},
@@ -788,6 +789,7 @@ func (n *ClusterPolicyController) init(ctx context.Context, reconciler *ClusterP
 		addState(n, "/opt/gpu-operator/state-mps-control-daemon")
 		addState(n, "/opt/gpu-operator/state-dcgm")
 		addState(n, "/opt/gpu-operator/state-dcgm-exporter")
+		addState(n, "/opt/gpu-operator/state-nvitop-exporter")
 		addState(n, "/opt/gpu-operator/gpu-feature-discovery")
 		addState(n, "/opt/gpu-operator/state-mig-manager")
 		addState(n, "/opt/gpu-operator/state-node-status-exporter")
@@ -994,6 +996,8 @@ func (n ClusterPolicyController) isStateEnabled(stateName string) bool {
 		return clusterPolicySpec.DCGM.IsEnabled()
 	case "state-dcgm-exporter":
 		return clusterPolicySpec.DCGMExporter.IsEnabled()
+	case "state-nvitop-exporter":
+		return clusterPolicySpec.NVITOPExporter.IsEnabled()
 	case "state-mig-manager":
 		return clusterPolicySpec.MIGManager.IsEnabled()
 	case "gpu-feature-discovery":

@@ -538,6 +538,38 @@ spec:
     {{- if .Values.dcgmExporter.hostPID }}
     hostPID: {{ .Values.dcgmExporter.hostPID }}
     {{- end }}
+  nvitopExporter:
+    enabled: {{ .Values.nvitopExporter.enabled }}
+    {{- if .Values.nvitopExporter.repository }}
+    repository: {{ .Values.nvitopExporter.repository }}
+    {{- end }}
+    {{- if .Values.nvitopExporter.image }}
+    image: {{ .Values.nvitopExporter.image }}
+    {{- end }}
+    {{- if .Values.nvitopExporter.version }}
+    version: {{ .Values.nvitopExporter.version | quote }}
+    {{- end }}
+    {{- if .Values.nvitopExporter.imagePullPolicy }}
+    imagePullPolicy: {{ .Values.nvitopExporter.imagePullPolicy }}
+    {{- end }}
+    {{- if .Values.nvitopExporter.imagePullSecrets }}
+    imagePullSecrets: {{ toYaml .Values.nvitopExporter.imagePullSecrets | nindent 6 }}
+    {{- end }}
+    {{- if .Values.nvitopExporter.resources }}
+    resources: {{ toYaml .Values.nvitopExporter.resources | nindent 6 }}
+    {{- end }}
+    {{- if .Values.nvitopExporter.env }}
+    env: {{ toYaml .Values.nvitopExporter.env | nindent 6 }}
+    {{- end }}
+    {{- if .Values.nvitopExporter.args }}
+    args: {{ toYaml .Values.nvitopExporter.args | nindent 6 }}
+    {{- end }}
+    {{- if .Values.nvitopExporter.serviceMonitor }}
+    serviceMonitor: {{ toYaml .Values.nvitopExporter.serviceMonitor | nindent 6 }}
+    {{- end }}
+    {{- if .Values.nvitopExporter.service }}
+    service: {{ toYaml .Values.nvitopExporter.service | nindent 6 }}
+    {{- end }}
   gfd:
     enabled: {{ .Values.gfd.enabled }}
     {{- if .Values.gfd.repository }}

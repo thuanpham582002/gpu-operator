@@ -1,0 +1,15 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: nvidia-nvitop-exporter
+  namespace: "FILLED BY THE OPERATOR"
+  labels:
+    app: nvidia-nvitop-exporter
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: nvidia-nvitop-exporter
+subjects:
+- kind: ServiceAccount
+  name: nvidia-nvitop-exporter
+  namespace: "FILLED BY THE OPERATOR"

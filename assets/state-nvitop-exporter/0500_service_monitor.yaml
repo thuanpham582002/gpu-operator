@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: nvidia-nvitop-exporter
+  namespace: "FILLED BY THE OPERATOR"
+  labels:
+    app: nvidia-nvitop-exporter
+spec:
+  selector:
+    matchLabels:
+      app: nvidia-nvitop-exporter
+  endpoints:
+  - port: metrics
+    interval: 30s
+    path: /metrics

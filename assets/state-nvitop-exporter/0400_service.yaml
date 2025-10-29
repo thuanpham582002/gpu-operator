@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nvidia-nvitop-exporter
+  namespace: "FILLED BY THE OPERATOR"
+  labels:
+    app: nvidia-nvitop-exporter
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9876"
+    prometheus.io/path: "/metrics"
+spec:
+  ports:
+  - port: 9876
+    name: metrics
+    protocol: TCP
+    targetPort: 9876
+  selector:
+    app: nvidia-nvitop-exporter
+  type: ClusterIP

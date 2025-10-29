@@ -53,6 +53,8 @@ type ClusterPolicySpec struct {
 	DevicePlugin DevicePluginSpec `json:"devicePlugin"`
 	// DCGMExporter spec
 	DCGMExporter DCGMExporterSpec `json:"dcgmExporter"`
+	// NVITOPExporter spec
+	NVITOPExporter NVITOPExporterSpec `json:"nvitopExporter"`
 	// DCGM component spec
 	DCGM DCGMSpec `json:"dcgm"`
 	// NodeStatusExporter spec
@@ -928,6 +930,109 @@ type DCGMExporterSpec struct {
 	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Enable hostPID for NVIDIA DCGM Exporter"
 	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.x-descriptors="urn:alm:descriptor:com.tectonic.ui:booleanSwitch"
 	HostPID *bool `json:"hostPID,omitempty"`
+}
+
+// NVITOPExporterSpec defines the properties for NVIDIA NVITOP Exporter deployment
+type NVITOPExporterSpec struct {
+	// Enabled indicates if deployment of NVIDIA NVITOP Exporter through operator is enabled
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Enable NVIDIA NVITOP Exporter deployment through GPU Operator"
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.x-descriptors="urn:alm:descriptor:com.tectonic.ui:booleanSwitch"
+	Enabled *bool `json:"enabled,omitempty"`
+
+	// NVIDIA NVITOP Exporter image repository
+	// +kubebuilder:validation:Optional
+	Repository string `json:"repository,omitempty"`
+
+	// NVIDIA NVITOP Exporter image name
+	// +kubebuilder:validation:Pattern=[a-zA-Z0-9\-]+
+	Image string `json:"image,omitempty"`
+
+	// NVIDIA NVITOP Exporter image tag
+	// +kubebuilder:validation:Optional
+	Version string `json:"version,omitempty"`
+
+	// Image pull policy
+	// +kubebuilder:validation:Optional
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Image Pull Policy"
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.x-descriptors="urn:alm:descriptor:com.tectonic.ui:imagePullPolicy"
+	ImagePullPolicy string `json:"imagePullPolicy,omitempty"`
+
+	// Image pull secrets
+	// +kubebuilder:validation:Optional
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Image pull secrets"
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.x-descriptors="urn:alm:descriptor:io.kubernetes:Secret"
+	ImagePullSecrets []string `json:"imagePullSecrets,omitempty"`
+
+	// Optional: Define resources requests and limits for each pod
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Resource Requirements"
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.x-descriptors="urn:alm:descriptor:com.tectonic.ui:advanced,urn:alm:descriptor:com.tectonic.ui:resourceRequirements"
+	Resources *ResourceRequirements `json:"resources,omitempty"`
+
+	// Optional: List of arguments
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Arguments"
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.x-descriptors="urn:alm:descriptor:com.tectonic.ui:advanced,urn:alm:descriptor:com.tectonic.ui:text"
+	Args []string `json:"args,omitempty"`
+
+	// Optional: List of environment variables
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Environment Variables"
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.x-descriptors="urn:alm:descriptor:com.tectonic.ui:advanced,urn:alm:descriptor:com.tectonic.ui:text"
+	Env []EnvVar `json:"env,omitempty"`
+
+	// Optional: ServiceMonitor configuration for Prometheus
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="ServiceMonitor Configuration"
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.x-descriptors="urn:alm:descriptor:com.tectonic.ui:advanced,urn:alm:descriptor:com.tectonic.ui:text"
+	ServiceMonitor *NVITOPExporterServiceMonitorConfig `json:"serviceMonitor,omitempty"`
+
+	// Optional: Service configuration
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Service Configuration"
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.x-descriptors="urn:alm:descriptor:com.tectonic.ui:advanced,urn:alm:descriptor:com.tectonic.ui:text"
+	Service *NVITOPExporterServiceConfig `json:"service,omitempty"`
+}
+
+// NVITOPExporterServiceMonitorConfig defines configuration options for the ServiceMonitor
+// deployed for NVITOP Exporter
+type NVITOPExporterServiceMonitorConfig struct {
+	// Enabled indicates if ServiceMonitor is deployed for NVIDIA NVITOP Exporter
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Enable deployment of NVIDIA NVITOP Exporter ServiceMonitor"
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.x-descriptors="urn:alm:descriptor:com.tectonic.ui:booleanSwitch"
+	Enabled *bool `json:"enabled,omitempty"`
+
+	// Interval which metrics should be scraped from NVIDIA NVITOP Exporter. If not specified Prometheus' global scrape interval is used.
+	// Supported units: y, w, d, h, m, s, ms
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Interval which metrics should be scraped from NVIDIA NVITOP Exporter"
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.x-descriptors="urn:alm:descriptor:com.tectonic.ui:text"
+	Interval promv1.Duration `json:"interval,omitempty"`
+
+	// HonorLabels chooses the metric's labels on collisions with target labels.
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Choose the metric's label on collisions with target labels"
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.x-descriptors="urn:alm:descriptor:com.tectonic.ui:booleanSwitch"
+	HonorLabels *bool `json:"honorLabels,omitempty"`
+}
+
+// NVITOPExporterServiceConfig defines the configuration options for the Kubernetes Service deployed for NVITOP Exporter
+type NVITOPExporterServiceConfig struct {
+	// Type represents the ServiceType which describes ingress methods for a service
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="ServiceType for the NVITOP Exporter K8s Service"
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.x-descriptors="urn:alm:descriptor:com.tectonic.ui:text"
+	Type corev1.ServiceType `json:"type,omitempty"`
+
+	// InternalTrafficPolicy describes how nodes distribute service traffic they receive on the ClusterIP.
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Internal Traffic Policy for the NVITOP Exporter K8s Service"
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.x-descriptors="urn:alm:descriptor:com.tectonic.ui:text"
+	InternalTrafficPolicy *corev1.ServiceInternalTrafficPolicy `json:"internalTrafficPolicy,omitempty"`
 }
 
 // DCGMExporterMetricsConfig defines metrics to be collected by NVIDIA DCGM Exporter
@@ -1927,6 +2032,15 @@ func (p *DevicePluginSpec) IsEnabled() bool {
 
 // IsEnabled returns true if dcgm-exporter is enabled(default) through gpu-operator
 func (e *DCGMExporterSpec) IsEnabled() bool {
+	if e.Enabled == nil {
+		// default is true if not specified by user
+		return true
+	}
+	return *e.Enabled
+}
+
+// IsEnabled returns true if nvitop-exporter is enabled(default) through gpu-operator
+func (e *NVITOPExporterSpec) IsEnabled() bool {
 	if e.Enabled == nil {
 		// default is true if not specified by user
 		return true
