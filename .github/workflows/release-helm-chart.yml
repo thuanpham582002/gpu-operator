@@ -1,0 +1,111 @@
+# Copyright 2024 NVIDIA CORPORATION
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Release Helm Chart
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+
+permissions:
+  contents: write
+
+jobs:
+  helm-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4.3.1
+        id: install
+
+      - name: Set version from tag or input
+        run: |
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+          else
+            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+          fi
+
+      - name: Validate Helm Chart
+        run: |
+          helm lint deployments/gpu-operator/
+          helm template gpu-operator deployments/gpu-operator/ --debug
+
+      - name: Package Helm Chart
+        run: |
+          cd deployments/gpu-operator
+          helm package . --version ${VERSION#v} --app-version ${VERSION#v}
+          echo "CHART_FILE=$(ls gpu-operator-*.tgz)" >> $GITHUB_ENV
+
+      - name: Generate Release Notes
+        id: release_notes
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_OUTPUT
+          echo "## GPU Operator Helm Chart ${VERSION}" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "### Installation" >> $GITHUB_OUTPUT
+          echo "\`\`\`bash" >> $GITHUB_OUTPUT
+          echo "helm install gpu-operator \\" >> $GITHUB_OUTPUT
+          echo "  https://github.com/${{ github.repository }}/releases/download/${VERSION}/${CHART_FILE} \\" >> $GITHUB_OUTPUT
+          echo "  --namespace gpu-operator --create-namespace \\" >> $GITHUB_OUTPUT
+          echo "  --set nvitopExporter.enabled=true" >> $GITHUB_OUTPUT
+          echo "\`\`\`" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "### Changes" >> $GITHUB_OUTPUT
+          echo "See git commit history for detailed changes." >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          name: GPU Operator Helm Chart ${{ env.VERSION }}
+          body: ${{ steps.release_notes.outputs.RELEASE_NOTES }}
+          files: |
+            deployments/gpu-operator/gpu-operator-*.tgz
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release from Manual Trigger
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          gh release create ${{ env.VERSION }} \
+            deployments/gpu-operator/gpu-operator-*.tgz \
+            --title "GPU Operator Helm Chart ${{ env.VERSION }}" \
+            --notes "## GPU Operator Helm Chart ${{ env.VERSION }}
+
+### Installation
+\`\`\`bash
+helm install gpu-operator \\
+  https://github.com/${{ github.repository }}/releases/download/${{ env.VERSION }}/${CHART_FILE} \\
+  --namespace gpu-operator --create-namespace \\
+  --set nvitopExporter.enabled=true
+\`\`\`
+
+### Changes
+Manually triggered release."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
