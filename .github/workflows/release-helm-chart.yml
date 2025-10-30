@@ -50,7 +50,8 @@ jobs:
           fi
           VERSION_NUMBER="${VERSION#v}"
           echo "VERSION_NUMBER=${VERSION_NUMBER}" >> $GITHUB_ENV
-          echo "Debug: VERSION=${VERSION}, VERSION_NUMBER=${VERSION_NUMBER}"
+          echo "IMAGE_TAG=${VERSION}" >> $GITHUB_ENV
+          echo "Debug: VERSION=${VERSION}, VERSION_NUMBER=${VERSION_NUMBER}, IMAGE_TAG=${IMAGE_TAG}"
 
       - name: Validate Helm Chart
         run: |
