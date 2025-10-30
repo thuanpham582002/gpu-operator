@@ -1,4 +1,4 @@
-/**
+ff/**
 # Copyright (c) NVIDIA CORPORATION.  All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -5121,4 +5121,53 @@ func PrometheusRule(n ClusterPolicyController) (gpuv1.State, error) {
 		return gpuv1.NotReady, err
 	}
 	return gpuv1.Ready, nil
+}
+
+// TransformNVITOPExporter updates the nvitop-exporter DaemonSet with configurations from the ClusterPolicySpec
+func TransformNVITOPExporter(obj *appsv1.DaemonSet, config *gpuv1.ClusterPolicySpec, n ClusterPolicyController) error {
+	// update validation container
+	err := transformValidationInitContainer(obj, config)
+	if err != nil {
+		return err
+	}
+
+	// update image
+	image, err := gpuv1.ImagePath(&config.NVITOPExporter)
+	if err != nil {
+		return err
+	}
+	obj.Spec.Template.Spec.Containers[0].Image = image
+
+	// update image pull policy
+	obj.Spec.Template.Spec.Containers[0].ImagePullPolicy = gpuv1.ImagePullPolicy(config.NVITOPExporter.ImagePullPolicy)
+
+	// set image pull secrets
+	if len(config.NVITOPExporter.ImagePullSecrets) > 0 {
+		addPullSecrets(&obj.Spec.Template.Spec, config.NVITOPExporter.ImagePullSecrets)
+	}
+
+	// set resource limits
+	if config.NVITOPExporter.Resources != nil {
+		// apply resource limits to all containers
+		for i := range obj.Spec.Template.Spec.Containers {
+			obj.Spec.Template.Spec.Containers[i].Resources.Requests = config.NVITOPExporter.Resources.Requests
+			obj.Spec.Template.Spec.Containers[i].Resources.Limits = config.NVITOPExporter.Resources.Limits
+		}
+	}
+
+	// set arguments if specified for exporter container
+	if len(config.NVITOPExporter.Args) > 0 {
+		obj.Spec.Template.Spec.Containers[0].Args = config.NVITOPExporter.Args
+	}
+
+	// set environment variables if specified
+	if len(config.NVITOPExporter.Env) > 0 {
+		obj.Spec.Template.Spec.Containers[0].Env = config.NVITOPExporter.Env
+	}
+
+	if err := controllerutil.SetControllerReference(n.singleton, obj, n.scheme); err != nil {
+		return err
+	}
+
+	return nil
 }
