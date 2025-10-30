@@ -5162,7 +5162,9 @@ func TransformNVITOPExporter(obj *appsv1.DaemonSet, config *gpuv1.ClusterPolicyS
 
 	// set environment variables if specified
 	if len(config.NVITOPExporter.Env) > 0 {
-		obj.Spec.Template.Spec.Containers[0].Env = config.NVITOPExporter.Env
+		for _, env := range config.NVITOPExporter.Env {
+			setContainerEnv(&(obj.Spec.Template.Spec.Containers[0]), env.Name, env.Value)
+		}
 	}
 
 	if err := controllerutil.SetControllerReference(n.singleton, obj, n.scheme); err != nil {
