@@ -18,6 +18,8 @@ on:
   push:
     branches:
       - main
+    tags:
+      - 'v*'
   workflow_dispatch:
     inputs:
       version:
@@ -39,8 +41,15 @@ jobs:
       - name: Set environment variables
         run: |
           if [[ "${{ github.event_name }}" == "push" ]]; then
-            COMMIT_SHORT_SHA=${GITHUB_SHA:0:8}
-            echo "VERSION=${COMMIT_SHORT_SHA}" >> $GITHUB_ENV
+            if [[ "${{ github.ref_type }}" == "tag" && "${{ github.ref_name }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              # For version tags (e.g., v1.0.0), strip 'v' prefix and use as version
+              VERSION="${{ github.ref_name }}"
+              echo "VERSION=${VERSION#v}" >> $GITHUB_ENV
+            else
+              # For branch pushes, use commit SHA
+              COMMIT_SHORT_SHA=${GITHUB_SHA:0:8}
+              echo "VERSION=${COMMIT_SHORT_SHA}" >> $GITHUB_ENV
+            fi
           else
             echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
           fi
@@ -62,7 +71,7 @@ jobs:
         with:
           context: .
           file: ./docker/Dockerfile
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           push: true
           tags: |
             ${{ env.IMAGE_NAME }}:${{ env.VERSION }}

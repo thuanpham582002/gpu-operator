@@ -748,6 +748,7 @@ func preProcessDaemonSet(obj *appsv1.DaemonSet, n ClusterPolicyController) error
 		"nvidia-sandbox-validator":                TransformSandboxValidator,
 		"nvidia-kata-manager":                     TransformKataManager,
 		"nvidia-cc-manager":                       TransformCCManager,
+		"nvidia-nvitop-exporter":                  TransformNVITOPExporter,
 	}
 
 	t, ok := transformations[obj.Name]

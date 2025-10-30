@@ -6,10 +6,13 @@ metadata:
   labels:
     app: nvidia-nvitop-exporter
 spec:
+  endpoints:
+    - port: gpu-metrics
+      path: "/metrics"
+  jobLabel: app
+  namespaceSelector:
+    matchNames:
+      - "FILLED BY THE OPERATOR"
   selector:
     matchLabels:
       app: nvidia-nvitop-exporter
-  endpoints:
-  - port: metrics
-    interval: 30s
-    path: /metrics

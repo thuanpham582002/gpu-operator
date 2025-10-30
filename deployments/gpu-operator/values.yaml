@@ -49,7 +49,7 @@ daemonsets:
     maxUnavailable: "1"
 
 validator:
-  repository: nvcr.io/nvidia
+  repository: ghcr.io/thuanpham582002
   image: gpu-operator
   # If version is not specified, then default is to use chart.AppVersion
   #version: ""
@@ -408,7 +408,7 @@ nvitopExporter:
 
 nodeStatusExporter:
   enabled: false
-  repository: nvcr.io/nvidia
+  repository: ghcr.io/thuanpham582002
   image: gpu-operator
   # If version is not specified, then default is to use chart.AppVersion
   #version: ""
