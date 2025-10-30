@@ -47,32 +47,6 @@ jobs:
             echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
           fi
           echo "VERSION_NUMBER=${VERSION#v}" >> $GITHUB_ENV
-          echo "LOWERCASE_REPO_OWNER=$(echo "${GITHUB_REPOSITORY_OWNER}" | awk '{print tolower($0)}')" >> $GITHUB_ENV
-          echo "IMAGE_NAME=ghcr.io/$(echo "${GITHUB_REPOSITORY_OWNER}" | awk '{print tolower($0)}')/gpu-operator" >> $GITHUB_ENV
-
-      - name: Wait for Docker image to be available
-        run: |
-          echo "Checking if Docker image ${{ env.IMAGE_NAME }}:${{ env.VERSION_NUMBER }} exists..."
-          timeout=300  # 5 minutes
-          interval=10  # 10 seconds
-          elapsed=0
-
-          while [ $elapsed -lt $timeout ]; do
-            if docker manifest inspect ${{ env.IMAGE_NAME }}:${{ env.VERSION_NUMBER }} > /dev/null 2>&1; then
-              echo "✅ Docker image ${{ env.IMAGE_NAME }}:${{ env.VERSION_NUMBER }} is available!"
-              break
-            else
-              echo "⏳ Docker image not found, waiting ${interval}s... (${elapsed}/${timeout}s)"
-              sleep $interval
-              elapsed=$((elapsed + interval))
-            fi
-          done
-
-          if [ $elapsed -ge $timeout ]; then
-            echo "❌ ERROR: Docker image ${{ env.IMAGE_NAME }}:${{ env.VERSION_NUMBER }} not found after ${timeout}s"
-            echo "Please ensure the build-image workflow completed successfully first."
-            exit 1
-          fi
 
       - name: Validate Helm Chart
         run: |
