@@ -299,3 +299,44 @@ install-tools:
 	@echo Installing tools from tools.go
 	export GOBIN=$(PROJECT_DIR)/bin && \
 	grep '^\s*_' tools/tools.go | awk '{print $$2}' | xargs -tI % $(GO_CMD) install -mod=readonly -modfile=tools/go.mod %
+
+##### Helm Chart Targets #####
+
+# Lint Helm chart
+helm-lint:
+	@echo Linting Helm chart...
+	helm lint deployments/gpu-operator/
+
+# Package Helm chart
+helm-package:
+	@echo Packaging Helm chart...
+	cd deployments/gpu-operator && \
+	helm package . --version $(VERSION) --app-version $(VERSION)
+
+# Test Helm chart templates
+helm-test:
+	@echo Testing Helm chart templates...
+	helm template gpu-operator deployments/gpu-operator/ --debug
+
+# Validate Helm chart values
+helm-validate: helm-lint helm-test
+
+# Install Helm chart locally for testing
+helm-install-local: helm-package
+	@echo Installing Helm chart locally...
+	helm install gpu-operator deployments/gpu-operator/gpu-operator-$(VERSION).tgz \
+		--namespace gpu-operator --create-namespace \
+		--wait --timeout=5m
+
+# Uninstall Helm chart locally
+helm-uninstall-local:
+	@echo Uninstalling Helm chart locally...
+	helm uninstall gpu-operator --namespace gpu-operator || true
+
+# Package and create release locally
+helm-release: helm-package
+	@echo Helm chart packaged successfully:
+	@ls -la deployments/gpu-operator/gpu-operator-*.tgz
+	@echo ""
+	@echo "To install:"
+	@echo "helm install gpu-operator deployments/gpu-operator/gpu-operator-$(VERSION).tgz --namespace gpu-operator --create-namespace"

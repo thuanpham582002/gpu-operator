@@ -187,7 +187,7 @@ metadata:
     capabilities: Deep Insights
     categories: AI/Machine Learning, OpenShift Optional
     certified: "true"
-    containerImage: ghcr.io/nvidia/gpu-operator:main-latest
+    containerImage: ghcr.io/thuanpham582002/gpu-operator:main-latest
     createdAt: "Thu Jul 27 13:57:56 PDT 2023"
     description: Automate the management and monitoring of NVIDIA GPUs.
     provider: NVIDIA
@@ -199,7 +199,7 @@ spec:
   apiservicedefinitions: {}
   relatedImages:
     - name: gpu-operator-image
-      image: ghcr.io/nvidia/gpu-operator:main-latest
+      image: ghcr.io/thuanpham582002/gpu-operator:main-latest
     - name: dcgm-exporter-image
       image: nvcr.io/nvidia/k8s/dcgm-exporter@sha256:ed2dfcb708949de649ab8e1b23521cfd1eba89774dbbe662b6835f1ffcaadb1a
     - name: dcgm-image
@@ -221,7 +221,7 @@ spec:
     - name: init-container-image
       image: nvcr.io/nvidia/cuda@sha256:d19fe621624c4eb6ac931b8558daa3ecc0c3f07f1e2a52e0267e083d22dceade
     - name: gpu-operator-validator-image
-      image: ghcr.io/nvidia/gpu-operator:main-latest
+      image: ghcr.io/thuanpham582002/gpu-operator:main-latest
     - name: k8s-driver-manager-image
       image: nvcr.io/nvidia/cloud-native/k8s-driver-manager@sha256:a6c12abacc9c4f51d3653c90fcad32f19799069889338601407eba05fea4ba18
     - name: vfio-manager-image
@@ -879,7 +879,7 @@ spec:
                   - --leader-elect
                   - --leader-lease-renew-deadline
                   - "60s"
-                image: ghcr.io/nvidia/gpu-operator:main-latest
+                image: ghcr.io/thuanpham582002/gpu-operator:main-latest
                 command:
                   - gpu-operator
                 livenessProbe:
@@ -917,7 +917,7 @@ spec:
                       fieldRef:
                         fieldPath: metadata.namespace
                   - name: "VALIDATOR_IMAGE"
-                    value: "ghcr.io/nvidia/gpu-operator:main-latest"
+                    value: "ghcr.io/thuanpham582002/gpu-operator:main-latest"
                   - name: "GFD_IMAGE"
                     value: "nvcr.io/nvidia/k8s-device-plugin@sha256:2d16df5f3f12081b4bd6b317cf697e5c7a195c53cec7e0bab756db02a06b985c"
                   - name: "CONTAINER_TOOLKIT_IMAGE"
