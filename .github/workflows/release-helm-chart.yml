@@ -42,11 +42,15 @@ jobs:
       - name: Set version from tag or input
         run: |
           if [[ "${{ github.event_name }}" == "push" ]]; then
-            echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+            VERSION="${GITHUB_REF_NAME}"
+            echo "VERSION=${VERSION}" >> $GITHUB_ENV
           else
-            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+            VERSION="${{ github.event.inputs.version }}"
+            echo "VERSION=${VERSION}" >> $GITHUB_ENV
           fi
-          echo "VERSION_NUMBER=${VERSION#v}" >> $GITHUB_ENV
+          VERSION_NUMBER="${VERSION#v}"
+          echo "VERSION_NUMBER=${VERSION_NUMBER}" >> $GITHUB_ENV
+          echo "Debug: VERSION=${VERSION}, VERSION_NUMBER=${VERSION_NUMBER}"
 
       - name: Validate Helm Chart
         run: |
