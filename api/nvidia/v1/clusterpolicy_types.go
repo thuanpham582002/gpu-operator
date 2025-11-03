@@ -1960,6 +1960,9 @@ func ImagePath(spec interface{}) (string, error) {
 	case *CCManagerSpec:
 		config := spec.(*CCManagerSpec)
 		return imagePath(config.Repository, config.Image, config.Version, "CC_MANAGER_IMAGE")
+	case *NVITOPExporterSpec:
+		config := spec.(*NVITOPExporterSpec)
+		return imagePath(config.Repository, config.Image, config.Version, "NVITOP_EXPORTER_IMAGE")
 	default:
 		return "", fmt.Errorf("invalid type to construct image path: %v", v)
 	}
