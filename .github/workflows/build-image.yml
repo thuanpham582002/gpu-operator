@@ -49,7 +49,9 @@ jobs:
               echo "VERSION=${COMMIT_SHORT_SHA}" >> $GITHUB_ENV
             fi
           else
-            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+            VERSION_INPUT="${{ github.event.inputs.version }}"
+            CLEAN_VERSION="${VERSION_INPUT#v}"
+            echo "VERSION=$CLEAN_VERSION" >> "$GITHUB_ENV"
           fi
           echo "LOWERCASE_REPO_OWNER=$(echo "${GITHUB_REPOSITORY_OWNER}" | awk '{print tolower($0)}')" >> $GITHUB_ENV
           echo "IMAGE_NAME=ghcr.io/$(echo "${GITHUB_REPOSITORY_OWNER}" | awk '{print tolower($0)}')/gpu-operator" >> $GITHUB_ENV
