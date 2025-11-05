@@ -1613,7 +1613,7 @@ spec:
                         type: object
                     type: object
                   service:
-                    description: Optional: Service configuration
+                    description: Service configuration
                     properties:
                       internalTrafficPolicy:
                         description: InternalTrafficPolicy describes how nodes distribute service traffic they receive on the ClusterIP.
@@ -1623,8 +1623,7 @@ spec:
                         type: string
                     type: object
                   serviceMonitor:
-                    description: Optional: ServiceMonitor configuration
-                    type: object
+                    description: ServiceMonitor configuration
                     properties:
                       additionalLabels:
                         additionalProperties:
