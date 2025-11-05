@@ -5168,6 +5168,9 @@ func TransformNVITOPExporter(obj *appsv1.DaemonSet, config *gpuv1.ClusterPolicyS
 		}
 	}
 
+	// set runtime class name
+	setRuntimeClassName(&obj.Spec.Template.Spec, config, n.runtime)
+
 	if err := controllerutil.SetControllerReference(n.singleton, obj, n.scheme); err != nil {
 		return err
 	}
