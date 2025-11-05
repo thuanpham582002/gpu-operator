@@ -1542,7 +1542,7 @@ spec:
                     description: Node Status Exporterimage tag
                     type: string
                 type: object
-h              nvitopExporter:
+              nvitopExporter:
                 description: NVITOPExporter spec
                 properties:
                   args:
@@ -1624,6 +1624,7 @@ h              nvitopExporter:
                     type: object
                   serviceMonitor:
                     description: Optional: ServiceMonitor configuration
+                    type: object
                     properties:
                       additionalLabels:
                         additionalProperties:
