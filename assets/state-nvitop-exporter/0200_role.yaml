@@ -6,11 +6,17 @@ metadata:
   labels:
     app: nvidia-nvitop-exporter
 rules:
-- apiGroups:
-  - ""
-  resources:
-  - nodes
-  - pods
-  verbs:
-  - get
-  - list
+  - apiGroups:
+      - security.openshift.io
+    resources:
+      - securitycontextconstraints
+    verbs:
+      - use
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+      - pods
+    verbs:
+      - get
+      - list
