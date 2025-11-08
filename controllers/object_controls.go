@@ -4807,6 +4807,50 @@ func ServiceMonitor(n ClusterPolicyController) (gpuv1.State, error) {
 			obj.Spec.Endpoints[0].RelabelConfigs = relabelConfigs
 		}
 	}
+	if n.stateNames[state] == "state-nvitop-exporter" {
+		serviceMonitor := n.singleton.Spec.NVITOPExporter.ServiceMonitor
+		// Check if ServiceMonitor is disabled and cleanup resource if exists
+		if serviceMonitor == nil || !serviceMonitor.IsEnabled() {
+			if !serviceMonitorCRDExists {
+				return gpuv1.Ready, nil
+			}
+			err := n.client.Delete(ctx, obj)
+			if err != nil && !apierrors.IsNotFound(err) {
+				logger.Info("Couldn't delete", "Error", err)
+				return gpuv1.NotReady, err
+			}
+			return gpuv1.Disabled, nil
+		}
+
+		if !serviceMonitorCRDExists {
+			logger.Error(fmt.Errorf("couldn't find ServiceMonitor CRD"), "Install Prometheus and necessary CRDs for gathering GPU metrics!")
+			return gpuv1.NotReady, nil
+		}
+
+		// Apply custom edits for NVITOP Exporter
+		if serviceMonitor.Interval != "" {
+			obj.Spec.Endpoints[0].Interval = serviceMonitor.Interval
+		}
+
+		if serviceMonitor.HonorLabels != nil {
+			obj.Spec.Endpoints[0].HonorLabels = *serviceMonitor.HonorLabels
+		}
+
+		if serviceMonitor.AdditionalLabels != nil {
+			for key, value := range serviceMonitor.AdditionalLabels {
+				obj.Labels[key] = value
+			}
+		}
+		if serviceMonitor.Relabelings != nil {
+			relabelConfigs := make([]promv1.RelabelConfig, len(serviceMonitor.Relabelings))
+			for i, relabel := range serviceMonitor.Relabelings {
+				if relabel != nil {
+					relabelConfigs[i] = *relabel
+				}
+			}
+			obj.Spec.Endpoints[0].RelabelConfigs = relabelConfigs
+		}
+	}
 	if n.stateNames[state] == "state-operator-metrics" || n.stateNames[state] == "state-node-status-exporter" {
 		// if ServiceMonitor CRD is missing, assume prometheus is not setup and ignore CR creation
 		if !serviceMonitorCRDExists {

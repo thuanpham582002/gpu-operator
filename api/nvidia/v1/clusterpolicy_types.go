@@ -1018,6 +1018,18 @@ type NVITOPExporterServiceMonitorConfig struct {
 	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Choose the metric's label on collisions with target labels"
 	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.x-descriptors="urn:alm:descriptor:com.tectonic.ui:booleanSwitch"
 	HonorLabels *bool `json:"honorLabels,omitempty"`
+
+	// AdditionalLabels to add to ServiceMonitor instance for NVIDIA NVITOP Exporter
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Additional labels to add to ServiceMonitor instance for NVIDIA NVITOP Exporter"
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.x-descriptors="urn:alm:descriptor:com.tectonic.ui:text"
+	AdditionalLabels map[string]string `json:"additionalLabels,omitempty"`
+
+	// Relabelings allows to rewrite labels on metric sets for NVIDIA NVITOP Exporter
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Relabelings allows to rewrite labels on metric sets for NVIDIA NVITOP Exporter"
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.x-descriptors="urn:alm:descriptor:com.tectonic.ui:advanced,urn:alm:descriptor:com.tectonic.ui:text"
+	Relabelings []*promv1.RelabelConfig `json:"relabelings,omitempty"`
 }
 
 // NVITOPExporterServiceConfig defines the configuration options for the Kubernetes Service deployed for NVITOP Exporter
