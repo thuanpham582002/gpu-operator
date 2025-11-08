@@ -2063,6 +2063,15 @@ func (e *NVITOPExporterSpec) IsEnabled() bool {
 	return *e.Enabled
 }
 
+// IsEnabled returns true if ServiceMonitor for NVITOP Exporter is enabled through gpu-operator
+func (sm *NVITOPExporterServiceMonitorConfig) IsEnabled() bool {
+	if sm.Enabled == nil {
+		// ServiceMonitor for NVITOP Exporter is disabled by default
+		return false
+	}
+	return *sm.Enabled
+}
+
 // IsHostPIDEnabled returns true if hostPID is enabled for DCGM Exporter
 func (e *DCGMExporterSpec) IsHostPIDEnabled() bool {
 	if e.HostPID == nil {
