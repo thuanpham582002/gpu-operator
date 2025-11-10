@@ -25,6 +25,7 @@ spec:
       priorityClassName: system-node-critical
       serviceAccountName: nvidia-nvitop-exporter
       hostNetwork: true
+      hostPID: true
       initContainers:
       - name: toolkit-validation
         image: "FILLED BY THE OPERATOR"
